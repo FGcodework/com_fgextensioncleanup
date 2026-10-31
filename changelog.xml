@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.1</version>
+		<security></security>
+		<fix>
+			<item>False "manifest missing" for components and modules whose manifest has a non-standard file name (e.g. manifest.xml).</item>
+		</fix>
+		<language></language>
+		<addition></addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.0</version>
 		<security></security>
 		<fix></fix>

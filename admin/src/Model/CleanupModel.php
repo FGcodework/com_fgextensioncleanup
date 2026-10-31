@@ -576,7 +576,8 @@ final class CleanupModel extends BaseDatabaseModel
                 $type,
                 $spec['manifest_name'],
                 $spec['accepted_names'],
-                $spec['client_name']
+                $spec['client_name'],
+                in_array($type, ['template', 'language'], true)
             );
             $candidate = [
                 'directory' => $spec['directory'] . '/',
@@ -607,7 +608,14 @@ final class CleanupModel extends BaseDatabaseModel
                 );
             }
 
-            return $this->result('ok', Text::_('COM_FGEXTENSIONCLEANUP_R_OK_L'), Text::sprintf('COM_FGEXTENSIONCLEANUP_R_OK_STD_D', $spec['directory']), null, false, [$candidate]);
+            $detail = Text::sprintf('COM_FGEXTENSIONCLEANUP_R_OK_STD_D', $spec['directory']);
+            foreach ($manifestResult['files'] as $manifestFile) {
+                if (!empty($manifestFile['valid']) && isset($manifestFile['standard']) && $manifestFile['standard'] === false) {
+                    $detail .= ' ' . Text::sprintf('COM_FGEXTENSIONCLEANUP_R_OK_NONSTD', basename((string) $manifestFile['path']));
+                }
+            }
+
+            return $this->result('ok', Text::_('COM_FGEXTENSIONCLEANUP_R_OK_L'), $detail, null, false, [$candidate]);
         }
 
         if ($type === 'library' || $type === 'package' || $type === 'file') {
@@ -878,7 +886,8 @@ final class CleanupModel extends BaseDatabaseModel
         string $expectedType,
         ?string $manifestName,
         array $acceptedNames,
-        ?string $expectedClient
+        ?string $expectedClient,
+        bool $strictName = true
     ): array {
         $entries = @scandir($absoluteDirectory);
         if ($entries === false) {
@@ -908,9 +917,15 @@ final class CleanupModel extends BaseDatabaseModel
 
             $parsed = $this->parseManifest($absoluteFile, $relativeFile, $expectedType, $expectedClient);
             if ($parsed['valid'] && !$expectedName) {
-                $parsed['valid'] = false;
-                $parsed['file']['valid'] = false;
-                $parsed['file']['reason'] = Text::_('COM_FGEXTENSIONCLEANUP_M_NAME_CONVENTION');
+                if ($strictName) {
+                    $parsed['valid'] = false;
+                    $parsed['file']['valid'] = false;
+                    $parsed['file']['reason'] = Text::_('COM_FGEXTENSIONCLEANUP_M_NAME_CONVENTION');
+                } else {
+                    // Joomla keeps the file name of the manifest from the install package, so any name is possible.
+                    $parsed['file']['standard'] = false;
+                    $parsed['file']['reason'] = Text::_('COM_FGEXTENSIONCLEANUP_M_NONSTANDARD_NAME');
+                }
             }
             $files[] = $parsed['file'];
         }

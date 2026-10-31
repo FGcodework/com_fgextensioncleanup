@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.1] - 2026-10-31
+
+### Fixed
+- False "Manifest missing or not valid" for components and modules whose manifest file has a non-standard name (for example `manifest.xml` instead of `com_name.xml`). Joomla keeps the manifest file name from the install package, so any name is valid. If exactly one valid manifest of the right type exists, the record is now OK (with a note about the file name); several valid manifests in one directory are still reported as ambiguous. Templates and languages stay strict (Joomla requires fixed file names there).
+
 ## [1.9.0] - 2026-10-31
 
 ### Added
