@@ -1,3 +1,5 @@
+<p align="center"><img src="assets/logo.png" alt="FG Extension Cleanup" width="128"></p>
+
 # FG Extension Cleanup
 
 [![Release](https://img.shields.io/github/v/release/FGcodework/com_fgextensioncleanup?style=flat-square)](https://github.com/FGcodework/com_fgextensioncleanup/releases/latest)
