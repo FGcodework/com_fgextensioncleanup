@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.9.2] - 2026-10-31
+
+### Added
+- New status filter tile **"Third-party"** ("Mimo jadra"): shows all extensions that are not Joomla core, whatever their status (OK, repairable, orphaned, other). Combines with the type chips and the search box.
+
+### Changed
+- Slightly narrower status tiles so that all eight fit on one row on wide screens.
+
 ## [1.9.1] - 2026-10-31
 
 ### Fixed

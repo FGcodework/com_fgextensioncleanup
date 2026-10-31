@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.2</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Status filter "Third-party": all extensions that are not Joomla core.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.1</version>
 		<security></security>
 		<fix>

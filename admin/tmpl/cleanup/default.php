@@ -17,6 +17,7 @@ $total = count($this->rows);
 
 $statusTiles = [
     'all' => ['label' => $t('F_ALL'), 'variant' => 'accent', 'count' => $total],
+    'thirdparty' => ['label' => $t('F_THIRDPARTY'), 'variant' => 'accent', 'count' => $total - (int) $counts['core']],
     'ok' => ['label' => $t('R_OK_L'), 'variant' => 'ok', 'count' => (int) $counts['ok']],
     'repairable' => ['label' => $t('F_REPAIRABLE'), 'variant' => 'warn', 'count' => (int) $counts['repairable']],
     'ambiguous' => ['label' => $t('F_AMBIGUOUS'), 'variant' => 'accent', 'count' => (int) $counts['ambiguous']],
@@ -103,7 +104,7 @@ html[data-bs-theme="dark"] .fg-cleanup, [data-bs-theme="dark"] .fg-cleanup {
 
 .fg-kicker { color: var(--accent); font-size: .74rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
 
-.fg-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.fg-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(156px, 1fr)); gap: 12px; margin-bottom: 22px; }
 .fg-tile {
     --tc: var(--accent);
     position: relative; display: flex; flex-direction: column; gap: 2px; align-items: flex-start;
@@ -462,7 +463,8 @@ $wa->addInlineScript(<<<'JS'
             var visible = 0;
 
             rows.forEach(function (row) {
-                var show = (state.status === 'all' || row.getAttribute('data-filter-group') === state.status)
+                var show = (state.status === 'all'
+                    || (state.status === 'thirdparty' ? row.getAttribute('data-core') !== '1' : row.getAttribute('data-filter-group') === state.status))
                     && (state.type === 'all' || row.getAttribute('data-extension-type') === state.type)
                     && (state.search === '' || (row.getAttribute('data-search') || '').indexOf(state.search) !== -1);
                 row.hidden = !show;
@@ -657,7 +659,7 @@ foreach ($this->rows as $item) {
                         };
                         $hasMore = !empty($analysis['candidates']) || !empty($analysis['package']) || !empty($analysis['blocked_paths']);
                         ?>
-                        <tr data-filter-group="<?php echo $e($filterGroup); ?>" data-extension-type="<?php echo $e($type); ?>"
+                        <tr data-filter-group="<?php echo $e($filterGroup); ?>" data-core="<?php echo $isCore ? '1' : '0'; ?>" data-extension-type="<?php echo $e($type); ?>"
                             data-search="<?php echo $e(mb_strtolower((int) $record->extension_id . ' ' . $record->name . ' ' . $record->element . ' ' . ($record->folder ?? '') . ' ' . $type)); ?>">
                             <td class="fg-col-toggle">
                                 <?php if ($hasMore) : ?>
