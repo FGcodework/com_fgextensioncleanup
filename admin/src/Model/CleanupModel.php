@@ -5,6 +5,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\Extension\ExtensionHelper;
 use FGcodework\Component\FgExtensionCleanup\Administrator\Service\BackupStore;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Table\Menu as MenuTable;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Database\DatabaseInterface;
 use RuntimeException;
@@ -135,7 +136,7 @@ final class CleanupModel extends BaseDatabaseModel
      */
     public function removeOrphanRecord(int $id): array
     {
-        $record = $this->getRecord($id, ['plugin', 'library']);
+        $record = $this->getRecord($id, ['plugin', 'library', 'component']);
         $type = (string) $record->type;
 
         $analysis = $type === 'plugin'
@@ -172,6 +173,10 @@ final class CleanupModel extends BaseDatabaseModel
                 $db->setQuery($query)->execute();
             }
 
+            if ($type === 'component') {
+                $this->removeAdminMenuEntries($extensionId);
+            }
+
             $db->transactionCommit();
         } catch (\Throwable $exception) {
             $db->transactionRollback();
@@ -196,6 +201,64 @@ final class CleanupModel extends BaseDatabaseModel
         ];
     }
 
+    /**
+     * A component record may be removed when the component is in no way present on disk (site, administrator and API
+     * directory all confirmed missing), is not Joomla core, not protected and not part of a package.
+     *
+     * @return array{removable: bool, note: string}
+     */
+    private function componentRemovalCheck(object $record): array
+    {
+        if (!empty($record->protected) || $this->isCoreExtension($record)) {
+            return ['removable' => false, 'note' => ''];
+        }
+
+        $element = (string) ($record->element ?? '');
+        if (!$this->isSafeSegment($element)) {
+            return ['removable' => false, 'note' => ''];
+        }
+
+        if ((int) ($record->package_id ?? 0) > 0) {
+            return ['removable' => false, 'note' => Text::_('COM_FGEXTENSIONCLEANUP_R_COMP_NOTE_PACKAGE')];
+        }
+
+        foreach ([['components'], ['administrator', 'components'], ['api', 'components']] as $base) {
+            $relative = implode('/', array_merge($base, [$element]));
+            $path = $this->inspectDirectoryChain(array_merge($base, [$element]), $relative);
+
+            if ($path['status'] !== 'missing') {
+                return ['removable' => false, 'note' => Text::sprintf('COM_FGEXTENSIONCLEANUP_R_LIB_NOTE_FILES', $relative)];
+            }
+        }
+
+        return ['removable' => true, 'note' => ''];
+    }
+
+    /** Administrator menu entries of a component, removed the way Joomla's own uninstaller does it. */
+    private function removeAdminMenuEntries(int $extensionId): void
+    {
+        $db = $this->db();
+        $db->setQuery(
+            $db->getQuery(true)
+                ->select($db->quoteName('id'))
+                ->from($db->quoteName('#__menu'))
+                ->where($db->quoteName('client_id') . ' = 1')
+                ->where($db->quoteName('component_id') . ' = ' . $extensionId)
+                ->order($db->quoteName('level') . ' DESC')
+        );
+        $ids = $db->loadColumn() ?: [];
+
+        if (!$ids) {
+            return;
+        }
+
+        $table = new MenuTable($db);
+        foreach ($ids as $menuId) {
+            $table->delete((int) $menuId);   // an already removed child simply returns false
+        }
+        $table->rebuild();
+    }
+
     /** Store the complete rows that are about to be deleted (see BackupStore). @return string path relative to the site root */
     private function writeBackup(object $record): string
     {
@@ -212,12 +275,23 @@ final class CleanupModel extends BaseDatabaseModel
             return $db->loadAssocList() ?: [];
         };
 
+        $fetchMenu = function () use ($db, $id): array {
+            $db->setQuery(
+                $db->getQuery(true)->select('*')->from($db->quoteName('#__menu'))
+                    ->where($db->quoteName('client_id') . ' = 1')
+                    ->where($db->quoteName('component_id') . ' = ' . $id)
+            );
+
+            return $db->loadAssocList() ?: [];
+        };
+
         return (new BackupStore())->write((string) $record->type, $id, [
             'kind' => 'extension',
             'note' => 'Rows deleted from the database. Restore them from FG Extension Cleanup or re-insert them with their original column names.',
             'extensions' => $fetch('#__extensions', 'extension_id'),
             'schemas' => $fetch('#__schemas', 'extension_id'),
             'update_sites_extensions' => $fetch('#__update_sites_extensions', 'extension_id'),
+            'admin_menu' => (string) $record->type === 'component' ? $fetchMenu() : [],
         ]);
     }
 
@@ -478,7 +552,20 @@ final class CleanupModel extends BaseDatabaseModel
 
             if ($path['status'] !== 'ok') {
                 if ($path['status'] === 'missing') {
-                    return $this->result('orphan', Text::_('COM_FGEXTENSIONCLEANUP_R_ORPHAN_DIR_L'), Text::sprintf('COM_FGEXTENSIONCLEANUP_R_ORPHAN_EXTDIR_D', $spec['directory']));
+                    $detail = Text::sprintf('COM_FGEXTENSIONCLEANUP_R_ORPHAN_EXTDIR_D', $spec['directory']);
+                    if ($type !== 'component') {
+                        return $this->result('orphan', Text::_('COM_FGEXTENSIONCLEANUP_R_ORPHAN_DIR_L'), $detail);
+                    }
+
+                    $check = $this->componentRemovalCheck($record);
+
+                    return $this->result(
+                        'orphan',
+                        Text::_('COM_FGEXTENSIONCLEANUP_R_ORPHAN_DIR_L'),
+                        $check['note'] !== '' ? $detail . ' ' . $check['note'] : $detail,
+                        null,
+                        $check['removable']
+                    );
                 }
                 return $this->pathFailureResult($path, Text::_('COM_FGEXTENSIONCLEANUP_P_EXT'));
             }

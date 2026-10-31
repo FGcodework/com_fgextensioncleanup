@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Safe removal of orphaned component records (all three directories missing, not core, not protected, not in a package), including administrator menu entries; backup first.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.8.0</version>
 		<security></security>
 		<fix></fix>

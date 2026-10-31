@@ -548,7 +548,7 @@ JS);
 <?php
 $removableCount = 0;
 foreach ($this->rows as $item) {
-    if (empty($item['core']) && in_array((string) $item['record']->type, ['plugin', 'library'], true)
+    if (empty($item['core']) && in_array((string) $item['record']->type, ['plugin', 'library', 'component'], true)
         && $item['analysis']['status'] === 'orphan' && $item['analysis']['removable'] && empty($item['record']->protected)) {
         $removableCount++;
     }
@@ -699,11 +699,11 @@ foreach ($this->rows as $item) {
                                         <?php echo HTMLHelper::_('form.token'); ?>
                                         <button type="submit" class="fg-btn fg-btn--sm fg-btn--warn"><?php echo $e($t('BTN_REPAIR')); ?></button>
                                     </form>
-                                <?php elseif ($this->canAdmin && in_array($type, ['plugin', 'library'], true) && $status === 'orphan' && $analysis['removable'] && empty($record->protected)) : ?>
+                                <?php elseif ($this->canAdmin && in_array($type, ['plugin', 'library', 'component'], true) && $status === 'orphan' && $analysis['removable'] && empty($record->protected)) : ?>
                                     <input type="checkbox" class="fg-pick" form="fg-bulk-form" name="extension_id[]" value="<?php echo (int) $record->extension_id; ?>"
                                            data-name="<?php echo $e($record->name . ' (' . $type . ': ' . $record->element . ')'); ?>"
                                            aria-label="<?php echo $e($t('BULK_SELECT_ROW')); ?>">
-                                    <form method="post" action="<?php echo $e($baseUrl); ?>" style="display:inline" data-fg-confirm="<?php echo $e($t('CONFIRM_REMOVE')); ?>" data-fg-details="<?php echo $e($record->name . ' (' . $type . ': ' . $record->element . ')'); ?>">
+                                    <form method="post" action="<?php echo $e($baseUrl); ?>" style="display:inline" data-fg-confirm="<?php echo $e($t($type === 'component' ? 'CONFIRM_REMOVE_COMPONENT' : 'CONFIRM_REMOVE')); ?>" data-fg-details="<?php echo $e($record->name . ' (' . $type . ': ' . $record->element . ')'); ?>">
                                         <input type="hidden" name="task" value="removeOrphanRecord">
                                         <input type="hidden" name="extension_id" value="<?php echo (int) $record->extension_id; ?>">
                                         <?php echo HTMLHelper::_('form.token'); ?>

@@ -11,7 +11,7 @@ use RuntimeException;
 /** Orphaned update sites and the backup/restore of everything this component deletes. */
 final class MaintenanceModel extends BaseDatabaseModel
 {
-    private const RESTORABLE_TYPES = ['plugin', 'library'];
+    private const RESTORABLE_TYPES = ['plugin', 'library', 'component'];
     private const REPORT_LIMIT = 100;
 
     // ---------------------------------------------------------------- update sites
@@ -206,7 +206,7 @@ final class MaintenanceModel extends BaseDatabaseModel
     /**
      * Put the rows of a backup back. Refuses when the extension / update site (or an equivalent record) exists again.
      *
-     * @return array{id: int, name: string, type: string}
+     * @return array{id: int, name: string, type: string, menu_skipped: bool}
      */
     public function restoreBackup(string $file): array
     {
@@ -231,7 +231,12 @@ final class MaintenanceModel extends BaseDatabaseModel
 
         $store->markRestored($file);
 
-        return ['id' => $summary['id'], 'name' => $summary['name'], 'type' => $summary['type']];
+        return [
+            'id' => $summary['id'],
+            'name' => $summary['name'],
+            'type' => $summary['type'],
+            'menu_skipped' => !empty($payload['admin_menu']),
+        ];
     }
 
     private function restoreExtension(array $payload): void

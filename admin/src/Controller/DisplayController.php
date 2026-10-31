@@ -99,7 +99,10 @@ final class DisplayController extends BaseController
         $this->guarded(function (): void {
             $info = $this->getModel('Maintenance')->restoreBackup($this->input->post->getString('file', ''));
             $this->logAction('COM_FGEXTENSIONCLEANUP_ACTIONLOG_RESTORED', $info);
-            $this->setMessage(Text::_('COM_FGEXTENSIONCLEANUP_MSG_RESTORED'), 'message');
+            $this->setMessage(
+                Text::_('COM_FGEXTENSIONCLEANUP_MSG_RESTORED') . (!empty($info['menu_skipped']) ? ' ' . Text::_('COM_FGEXTENSIONCLEANUP_MSG_RESTORED_NO_MENU') : ''),
+                'message'
+            );
         });
     }
 

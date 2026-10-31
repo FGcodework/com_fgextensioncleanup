@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.9.0] - 2026-10-31
+
+### Added
+- **Removal of orphaned component records.** A component record whose directories are missing gets a "Remove record" button (also in bulk) when it is not Joomla core, not `protected`, not part of a package and its site, administrator **and** API directory are all confirmed missing. Besides the `#__extensions`, `#__schemas` and `#__update_sites_extensions` rows, its administrator menu entries are removed the way Joomla's uninstaller does it (menu table delete + rebuild). Database tables of the component, `#__assets`, site menu items and files are never touched (site menu items of a missing component show up in the "Other orphaned records" report).
+- A JSON backup is saved first and includes the administrator menu rows. Restoring a component backup re-creates the extension record, schemas and update-site links, but not the administrator menu entries (reinstall the component to recreate them) – the restore message says so.
+
+### Changed
+- Removal messages and the safe-mode note now mention components.
+
 ## [1.8.0] - 2026-10-31
 
 ### Added
