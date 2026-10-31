@@ -222,6 +222,22 @@ html[data-bs-theme="dark"] .fg-cleanup, [data-bs-theme="dark"] .fg-cleanup {
 .fg-sub-table .fg-nowrap { white-space: nowrap; }
 .fg-pill--small { font-size: .7rem; }
 
+.fg-search { margin: 0 0 16px; }
+.fg-search input {
+    width: min(100%, 420px); min-height: 38px; padding: 0 14px; border: 1px solid var(--border); border-radius: 999px;
+    background: var(--panel); color: var(--text); font: inherit; font-size: .88rem; outline: none; transition: .2s ease;
+}
+.fg-search input::placeholder { color: var(--muted); }
+.fg-search input:focus { border-color: color-mix(in srgb, var(--accent) 55%, transparent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.fg-oo { border-top: 1px solid var(--border); }
+.fg-oo summary { display: flex; align-items: center; gap: 10px; padding: 12px 20px; cursor: pointer; color: var(--text); font-weight: 700; font-size: .92rem; list-style: none; }
+.fg-oo summary::-webkit-details-marker { display: none; }
+.fg-oo summary::before { content: "›"; color: var(--accent); font-size: 1.2rem; transition: transform .15s ease; }
+.fg-oo[open] summary::before { transform: rotate(90deg); }
+.fg-oo .fg-count { margin-left: auto; }
+.fg-oo--none summary { cursor: default; color: var(--muted); font-weight: 500; }
+.fg-oo--none summary::before { content: "✓"; color: var(--ok); }
+
 /* Confirmation dialog + "please wait" overlay (FG style, replaces window.confirm) */
 .fg-overlay {
     position: fixed; inset: 0; z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 16px;
@@ -413,7 +429,8 @@ $wa->addInlineScript(<<<'JS'
 
         var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr[data-filter-group]'));
         var total = rows.length;
-        var state = { status: 'all', type: 'all' };
+        var state = { status: 'all', type: 'all', search: '' };
+        var searchBox = byId('fg-search');
         var picks = Array.prototype.slice.call(root.querySelectorAll('.fg-pick'));
         var selectAll = byId('fg-select-all');
         var bulkButton = byId('fg-bulk-button');
@@ -446,7 +463,8 @@ $wa->addInlineScript(<<<'JS'
 
             rows.forEach(function (row) {
                 var show = (state.status === 'all' || row.getAttribute('data-filter-group') === state.status)
-                    && (state.type === 'all' || row.getAttribute('data-extension-type') === state.type);
+                    && (state.type === 'all' || row.getAttribute('data-extension-type') === state.type)
+                    && (state.search === '' || (row.getAttribute('data-search') || '').indexOf(state.search) !== -1);
                 row.hidden = !show;
                 var detail = row.nextElementSibling;
                 if (detail && detail.classList.contains('fg-detail-row')) {
@@ -467,6 +485,20 @@ $wa->addInlineScript(<<<'JS'
             counter.textContent = Joomla.Text._('COM_FGEXTENSIONCLEANUP_VISIBLE_COUNT')
                 .replace('%1$d', visible)
                 .replace('%2$d', total);
+        }
+
+        if (searchBox) {
+            searchBox.addEventListener('input', function () {
+                state.search = searchBox.value.trim().toLowerCase();
+                applyFilters();
+            });
+            searchBox.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && searchBox.value !== '') {
+                    searchBox.value = '';
+                    state.search = '';
+                    applyFilters();
+                }
+            });
         }
 
         // Both filter groups are plain button sets: [data-fg-status] tiles and [data-fg-type] chips.
@@ -558,6 +590,10 @@ foreach ($this->rows as $item) {
         <?php endforeach; ?>
     </div>
 
+    <div class="fg-search">
+        <input type="search" id="fg-search" autocomplete="off" placeholder="<?php echo $e($t('SEARCH_PLACEHOLDER')); ?>" aria-label="<?php echo $e($t('SEARCH_PLACEHOLDER')); ?>">
+    </div>
+
     <div class="fg-panel">
         <div class="fg-panel__head">
             <h2><?php echo $e($t('RESULTS_TITLE')); ?></h2>
@@ -621,7 +657,8 @@ foreach ($this->rows as $item) {
                         };
                         $hasMore = !empty($analysis['candidates']) || !empty($analysis['package']) || !empty($analysis['blocked_paths']);
                         ?>
-                        <tr data-filter-group="<?php echo $e($filterGroup); ?>" data-extension-type="<?php echo $e($type); ?>">
+                        <tr data-filter-group="<?php echo $e($filterGroup); ?>" data-extension-type="<?php echo $e($type); ?>"
+                            data-search="<?php echo $e(mb_strtolower((int) $record->extension_id . ' ' . $record->name . ' ' . $record->element . ' ' . ($record->folder ?? '') . ' ' . $type)); ?>">
                             <td class="fg-col-toggle">
                                 <?php if ($hasMore) : ?>
                                     <button type="button" class="fg-toggle" data-fg-toggle aria-expanded="false" aria-label="<?php echo $e($t('TOGGLE_DETAILS')); ?>" title="<?php echo $e($t('TOGGLE_DETAILS')); ?>">›</button>
@@ -827,6 +864,78 @@ foreach ($this->rows as $item) {
                 </table>
             </div>
         <?php endif; ?>
+    </div>
+
+    <?php
+    $oo = $this->otherOrphans;
+    $ooLimit = (int) ($oo['limit'] ?? 100);
+    $ooSections = [
+        'modules' => $t('OO_MODULES'),
+        'menu' => $t('OO_MENU'),
+        'schemas' => $t('OO_SCHEMAS'),
+        'links' => $t('OO_LINKS'),
+    ];
+    $ooState = static fn ($published): string => match ((int) $published) {
+        1 => Text::_('COM_FGEXTENSIONCLEANUP_OO_PUBLISHED'),
+        0 => Text::_('COM_FGEXTENSIONCLEANUP_OO_UNPUBLISHED'),
+        default => Text::_('COM_FGEXTENSIONCLEANUP_OO_TRASHED'),
+    };
+    ?>
+    <div class="fg-panel" id="fg-other-orphans">
+        <div class="fg-panel__head"><h2><?php echo $e($t('OO_TITLE')); ?></h2></div>
+        <div class="fg-panel__note"><?php echo $e($t('OO_NOTE')); ?></div>
+        <?php foreach ($ooSections as $key => $label) : ?>
+            <?php $items = $oo[$key] ?? []; $n = count($items); ?>
+            <?php if ($n === 0) : ?>
+                <details class="fg-oo fg-oo--none"><summary><?php echo $e($label); ?> <span class="fg-count"><?php echo $e($t('OO_NONE')); ?></span></summary></details>
+                <?php continue; ?>
+            <?php endif; ?>
+            <details class="fg-oo">
+                <summary><?php echo $e($label); ?>
+                    <span class="fg-pill fg-pill--bad fg-count"><?php echo $n > $ooLimit ? $ooLimit . '+' : $n; ?></span></summary>
+                <div class="fg-scroll">
+                    <table class="fg-table fg-sub-table">
+                        <thead><tr>
+                        <?php if ($key === 'modules') : ?>
+                            <th>ID</th><th><?php echo $e($t('TH_TITLE')); ?></th><th><?php echo $e($t('OO_TH_MODULE')); ?></th><th><?php echo $e($t('OO_TH_POSITION')); ?></th><th><?php echo $e($t('TH_STATUS')); ?></th>
+                        <?php elseif ($key === 'menu') : ?>
+                            <th>ID</th><th><?php echo $e($t('TH_TITLE')); ?></th><th><?php echo $e($t('OO_TH_MENU')); ?></th><th>Link</th><th><?php echo $e($t('TH_STATUS')); ?></th>
+                        <?php elseif ($key === 'schemas') : ?>
+                            <th><?php echo $e($t('OO_TH_EXT_ID')); ?></th><th><?php echo $e($t('OO_TH_VERSION')); ?></th>
+                        <?php else : ?>
+                            <th><?php echo $e($t('OO_TH_SITE')); ?></th><th><?php echo $e($t('TH_NAME')); ?></th><th><?php echo $e($t('OO_TH_EXT_ID')); ?></th>
+                        <?php endif; ?>
+                        </tr></thead>
+                        <tbody>
+                        <?php foreach (array_slice($items, 0, $ooLimit) as $row) : ?>
+                            <tr>
+                            <?php if ($key === 'modules') : ?>
+                                <td><?php echo (int) $row->id; ?></td>
+                                <td><span class="fg-name"><?php echo $e($row->title); ?></span></td>
+                                <td><code class="fg-el"><?php echo $e($row->module); ?></code><span class="fg-line2"><?php echo $e((int) $row->client_id === 1 ? $t('CLIENT_ADMIN') : $t('CLIENT_SITE')); ?></span></td>
+                                <td><?php echo $e((string) $row->position ?: '—'); ?></td>
+                                <td><?php echo $e($ooState($row->published)); ?></td>
+                            <?php elseif ($key === 'menu') : ?>
+                                <td><?php echo (int) $row->id; ?></td>
+                                <td><span class="fg-name"><?php echo $e($row->title); ?></span></td>
+                                <td><?php echo $e($row->menutype); ?></td>
+                                <td><code class="fg-el" style="word-break:break-all"><?php echo $e($row->link); ?></code></td>
+                                <td><?php echo $e($ooState($row->published)); ?></td>
+                            <?php elseif ($key === 'schemas') : ?>
+                                <td><?php echo (int) $row->extension_id; ?></td>
+                                <td><code class="fg-el"><?php echo $e($row->version_id); ?></code></td>
+                            <?php else : ?>
+                                <td><?php echo (int) $row->update_site_id; ?></td>
+                                <td><?php echo $e((string) ($row->name ?? '—')); ?></td>
+                                <td><?php echo (int) $row->extension_id; ?></td>
+                            <?php endif; ?>
+                            </tr>
+                        <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        <?php endforeach; ?>
     </div>
 
     <?php if ($this->canAdmin) : ?>

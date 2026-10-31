@@ -5,8 +5,9 @@
 	<creationDate>October 2026</creationDate>
 	<copyright>(C) FGcodework</copyright>
 	<license>GNU General Public License version 2 or later</license>
-	<version>1.7.2</version>
+	<version>1.8.0</version>
 	<description>COM_FGEXTENSIONCLEANUP_XML_DESCRIPTION</description>
+	<scriptfile>script.php</scriptfile>
 	<namespace path="src">FGcodework\Component\FgExtensionCleanup</namespace>
 	<administration>
 		<menu link="index.php?option=com_fgextensioncleanup">COM_FGEXTENSIONCLEANUP</menu>

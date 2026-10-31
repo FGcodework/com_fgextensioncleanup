@@ -12,6 +12,7 @@ use RuntimeException;
 final class MaintenanceModel extends BaseDatabaseModel
 {
     private const RESTORABLE_TYPES = ['plugin', 'library'];
+    private const REPORT_LIMIT = 100;
 
     // ---------------------------------------------------------------- update sites
 
@@ -120,6 +121,73 @@ final class MaintenanceModel extends BaseDatabaseModel
         }
 
         return ['id' => $id, 'name' => $site['name'], 'backup' => $backup];
+    }
+
+    // ---------------------------------------------------------------- other orphaned records (read-only report)
+
+    /**
+     * Records outside #__extensions that point to an extension which no longer exists. Report only: nothing here is
+     * ever deleted by this component.
+     *
+     * @return array{modules: array, menu: array, schemas: array, links: array, limit: int}
+     */
+    public function getOtherOrphans(): array
+    {
+        $db = $this->db();
+        $limit = self::REPORT_LIMIT + 1;
+        $result = ['limit' => self::REPORT_LIMIT];
+
+        // Module instances whose module extension is not registered (same client).
+        $query = $db->getQuery(true)
+            ->select([
+                $db->quoteName('m.id'), $db->quoteName('m.title'), $db->quoteName('m.module'),
+                $db->quoteName('m.client_id'), $db->quoteName('m.position'), $db->quoteName('m.published'),
+            ])
+            ->from($db->quoteName('#__modules', 'm'))
+            ->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.type') . ' = ' . $db->quote('module')
+                . ' AND ' . $db->quoteName('e.element') . ' = ' . $db->quoteName('m.module')
+                . ' AND ' . $db->quoteName('e.client_id') . ' = ' . $db->quoteName('m.client_id'))
+            ->where($db->quoteName('e.extension_id') . ' IS NULL')
+            ->order($db->quoteName('m.id') . ' ASC');
+        $result['modules'] = $db->setQuery($query, 0, $limit)->loadObjectList() ?: [];
+
+        // Site menu items of type "component" whose component record no longer exists.
+        $query = $db->getQuery(true)
+            ->select([
+                $db->quoteName('mi.id'), $db->quoteName('mi.title'), $db->quoteName('mi.link'),
+                $db->quoteName('mi.menutype'), $db->quoteName('mi.published'), $db->quoteName('mi.component_id'),
+            ])
+            ->from($db->quoteName('#__menu', 'mi'))
+            ->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.extension_id') . ' = ' . $db->quoteName('mi.component_id'))
+            ->where($db->quoteName('mi.type') . ' = ' . $db->quote('component'))
+            ->where($db->quoteName('mi.client_id') . ' = 0')
+            ->where($db->quoteName('mi.component_id') . ' > 0')
+            ->where($db->quoteName('e.extension_id') . ' IS NULL')
+            ->order($db->quoteName('mi.id') . ' ASC');
+        $result['menu'] = $db->setQuery($query, 0, $limit)->loadObjectList() ?: [];
+
+        // Schema versions of extensions that are gone.
+        $query = $db->getQuery(true)
+            ->select([$db->quoteName('s.extension_id'), $db->quoteName('s.version_id')])
+            ->from($db->quoteName('#__schemas', 's'))
+            ->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.extension_id') . ' = ' . $db->quoteName('s.extension_id'))
+            ->where($db->quoteName('e.extension_id') . ' IS NULL')
+            ->order($db->quoteName('s.extension_id') . ' ASC');
+        $result['schemas'] = $db->setQuery($query, 0, $limit)->loadObjectList() ?: [];
+
+        // Update-site links to missing extensions. Sites that are orphaned as a whole are handled by the update-site panel.
+        $orphanSiteIds = array_column($this->getUpdateSites()['orphans'], 'id');
+        $query = $db->getQuery(true)
+            ->select([$db->quoteName('l.update_site_id'), $db->quoteName('l.extension_id'), $db->quoteName('us.name')])
+            ->from($db->quoteName('#__update_sites_extensions', 'l'))
+            ->join('LEFT', $db->quoteName('#__extensions', 'e') . ' ON ' . $db->quoteName('e.extension_id') . ' = ' . $db->quoteName('l.extension_id'))
+            ->join('LEFT', $db->quoteName('#__update_sites', 'us') . ' ON ' . $db->quoteName('us.update_site_id') . ' = ' . $db->quoteName('l.update_site_id'))
+            ->where($db->quoteName('e.extension_id') . ' IS NULL')
+            ->order($db->quoteName('l.update_site_id') . ' ASC');
+        $links = $db->setQuery($query, 0, $limit)->loadObjectList() ?: [];
+        $result['links'] = array_values(array_filter($links, static fn (object $l): bool => !in_array((int) $l->update_site_id, $orphanSiteIds, true)));
+
+        return $result;
     }
 
     // ---------------------------------------------------------------- backups

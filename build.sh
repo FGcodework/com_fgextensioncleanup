@@ -6,7 +6,7 @@ version=$(sed -n 's:.*<version>\(.*\)</version>.*:\1:p' com_fgextensioncleanup.x
 name="com_fgextensioncleanup_v${version}.zip"
 tmp=$(mktemp -d)
 mkdir "$tmp/com_fgextensioncleanup"
-cp -r com_fgextensioncleanup.xml admin "$tmp/com_fgextensioncleanup/"
+cp -r com_fgextensioncleanup.xml script.php admin "$tmp/com_fgextensioncleanup/"
 rm -f "$name"
 (cd "$tmp" && zip -qr "$OLDPWD/$name" com_fgextensioncleanup)
 rm -rf "$tmp"

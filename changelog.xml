@@ -3,6 +3,22 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.8.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Search box above the results table.</item>
+			<item>Read-only report of other orphaned records (modules, menu items, schemas, update-site links).</item>
+			<item>Registration in the User Actions Log extension filter.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.7.2</version>
 		<security></security>
 		<fix></fix>

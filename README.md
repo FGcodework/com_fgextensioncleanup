@@ -18,6 +18,7 @@ Administrator component for **Joomla 5 and 6** that diagnoses and safely cleans 
 - **Orphaned update sites** (no linked extension, or the linked records are gone) – the usual cause of "Update site not found". Joomla's own update sites are never removed.
 - **Backup before every deletion** as JSON in Joomla's log folder (`administrator/logs/`, mode 0600, random part in the file name), with **Restore** and **Delete** buttons in the component. If a backup cannot be written, nothing is deleted.
 - Entries in Joomla's **User Actions Log** for every repair, removal, restore and backup deletion.
+- **Search** by name, element, ID or folder, plus a **read-only report** of other orphaned records (modules without a module extension, menu items of a missing component, schema versions, update-site links).
 - Status tiles and type chips as filters, expandable detail rows, light and dark mode, FG design.
 
 ## Permissions

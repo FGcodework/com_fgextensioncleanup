@@ -15,6 +15,7 @@ final class HtmlView extends BaseHtmlView
     protected bool $canAdmin = false;
     protected array $updateSites = ['orphans' => [], 'total' => 0];
     protected array $backups = [];
+    protected array $otherOrphans = [];
 
     public function display($tpl = null): void
     {
@@ -28,6 +29,7 @@ final class HtmlView extends BaseHtmlView
             ->getMVCFactory()
             ->createModel('Maintenance', 'Administrator', ['ignore_request' => true]);
         $this->updateSites = $maintenance->getUpdateSites();
+        $this->otherOrphans = $maintenance->getOtherOrphans();
         if ($this->canAdmin) {
             // Backups can contain extension parameters, so only administrators get to see them.
             $this->backups = $maintenance->getBackups();

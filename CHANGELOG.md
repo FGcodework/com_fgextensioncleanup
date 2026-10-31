@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.8.0] - 2026-10-31
+
+### Added
+- **Search box** above the table: filters by name, element, ID, folder and type (case-insensitive, combines with the status and type filters, Esc clears it).
+- **Other orphaned records (read-only report).** Module instances without an installed module extension, site menu items of a missing component, schema versions of missing extensions and update-site links to missing extensions. The component only reports them and never deletes them.
+- **User Actions Log registration.** The installer script registers the component in `#__action_logs_extensions` (on install and on every update, removed on uninstall), so it appears in the "Extension" filter of the Users → User Actions Log.
+
+### Changed
+- `script.php` is now part of the package and `build.sh`.
+
 ## [1.7.2] - 2026-10-31
 
 ### Changed
