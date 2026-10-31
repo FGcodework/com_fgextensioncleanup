@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<changelogs>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.7.2</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Update server and changelog URLs point to the master branch of the public GitHub repository.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.7.1</version>
+		<security></security>
+		<fix>
+			<item>Restore from backup failed because insertObject() received an expression instead of a variable.</item>
+		</fix>
+		<language></language>
+		<addition></addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.7.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Bulk removal of orphaned plugin/library records.</item>
+			<item>Orphaned update sites panel with removal (backup first).</item>
+			<item>Restore and delete of backups from the component.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.6.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>JSON backup of the deleted rows before every removal (administrator/logs).</item>
+			<item>Repairs and removals are written to the User Actions Log.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.5.1</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Styled confirmation dialog instead of the native browser confirm box; "Please wait..." overlay during Refresh scan and actions.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.5.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Safe removal of the database record of an orphaned library (not core, not protected, not in a package, files and manifest missing, not referenced by other extensions).</item>
+		</addition>
+		<change>
+			<item>Removal messages and confirmation now cover plugins and libraries.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.4.0</version>
+		<security></security>
+		<fix>
+			<item>False orphan finding for core libraries such as lib_joomla.</item>
+		</fix>
+		<language></language>
+		<addition>
+			<item>Joomla core extensions grouped separately and excluded from orphan counts; never offered for repair or removal.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.3.3</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Two-line name and element cells, uniform row height.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.3.2</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Expand arrow moved to its own first column and made more visible; detail text is clickable.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.3.1</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Compact results table with one line per record; details expand under the row.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.3.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Redesigned in the FG visual style (fgcodework.github.io), light and dark.</item>
+			<item>Status tiles and type pills replace the filter drop-downs.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.2.0</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Status filter is now a row of clickable buttons with record counts.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.1.3</version>
+		<security></security>
+		<fix>
+			<item>Status and type filters did nothing: script ran in head before the table existed. Now waits for DOMContentLoaded.</item>
+		</fix>
+		<language></language>
+		<addition></addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.1.2</version>
+		<security></security>
+		<fix>
+			<item>Translations not shown after upgrade from 1.1.0: language files are installed to administrator/language again, overwriting the old files.</item>
+		</fix>
+		<language></language>
+		<addition></addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
+		<version>1.1.1</version>
+		<security></security>
+		<fix>
+			<item>Invalid CSRF token now redirects with an error message instead of an unhandled exception.</item>
+		</fix>
+		<language></language>
+		<addition>
+			<item>Full EN/SK localisation of all texts.</item>
+			<item>Permissions tab (config.xml); repair and removal require core.admin.</item>
+			<item>Orphaned plugin record removal also cleans #__schemas and #__update_sites_extensions.</item>
+			<item>Update server and changelog URL in the manifest.</item>
+		</addition>
+		<change>
+			<item>Script registered via Web Asset Manager; no inline handlers (CSP friendly).</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+</changelogs>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade" version="5.0">
+	<name>COM_FGEXTENSIONCLEANUP</name>
+	<author>FGcodework</author>
+	<creationDate>October 2026</creationDate>
+	<copyright>(C) FGcodework</copyright>
+	<license>GNU General Public License version 2 or later</license>
+	<version>1.7.2</version>
+	<description>COM_FGEXTENSIONCLEANUP_XML_DESCRIPTION</description>
+	<namespace path="src">FGcodework\Component\FgExtensionCleanup</namespace>
+	<administration>
+		<menu link="index.php?option=com_fgextensioncleanup">COM_FGEXTENSIONCLEANUP</menu>
+		<languages folder="admin/language">
+			<language tag="en-GB">en-GB/com_fgextensioncleanup.ini</language>
+			<language tag="en-GB">en-GB/com_fgextensioncleanup.sys.ini</language>
+			<language tag="sk-SK">sk-SK/com_fgextensioncleanup.ini</language>
+			<language tag="sk-SK">sk-SK/com_fgextensioncleanup.sys.ini</language>
+		</languages>
+		<files folder="admin">
+			<folder>services</folder>
+			<folder>src</folder>
+			<folder>tmpl</folder>
+			<filename>access.xml</filename>
+			<filename>config.xml</filename>
+		</files>
+	</administration>
+	<changelogurl>https://raw.githubusercontent.com/FGcodework/com_fgextensioncleanup/master/changelog.xml</changelogurl>
+	<updateservers>
+		<server type="extension" priority="1" name="FG Extension Cleanup">https://raw.githubusercontent.com/FGcodework/com_fgextensioncleanup/master/updates.xml</server>
+	</updateservers>
+</extension>
