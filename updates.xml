@@ -6,12 +6,12 @@
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
 		<client>administrator</client>
-		<version>1.9.4</version>
+		<version>1.9.5</version>
 		<infourl title="FG Extension Cleanup">https://github.com/FGcodework/com_fgextensioncleanup</infourl>
 		<downloads>
-			<downloadurl type="full" format="zip">https://github.com/FGcodework/com_fgextensioncleanup/releases/download/v1.9.4/com_fgextensioncleanup_v1.9.4.zip</downloadurl>
+			<downloadurl type="full" format="zip">https://github.com/FGcodework/com_fgextensioncleanup/releases/download/v1.9.5/com_fgextensioncleanup_v1.9.5.zip</downloadurl>
 		</downloads>
-		<sha512>742685d987b846e284a9e884d4215669e877c46c6b25ea70afba66c0a0c0dc4c875960fe3fdbbac728c35daa0262eaae507167aabe902c14365b40783f9d8d7b</sha512>
+		<sha512>c6d95b5de1ffd55b58185b6e3305f31851c5250f7a9d7e735cdfaaaf8072b7727fcdfff39025892b6060755bb0eb4539f9e7f74870592f1b27a2d7fe552c2107</sha512>
 		<tags><tag>stable</tag></tags>
 		<maintainer>FGcodework</maintainer>
 		<maintainerurl>https://github.com/FGcodework</maintainerurl>

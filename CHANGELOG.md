@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.5] - 2026-10-31
+
+### Changed
+- Linked filters: the status tiles and the type chips now recalculate their counts from the other active filters (and the search box). E.g. after choosing "Third-party", "All types" shows only the third-party total and each type chip its third-party count; types with no match are dimmed.
+
 ## [1.9.4] - 2026-10-31
 
 ### Changed

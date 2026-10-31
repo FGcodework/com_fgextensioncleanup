@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.5</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Status tiles and type chips recalculate their counts according to the other active filters and the search.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.4</version>
 		<security></security>
 		<fix></fix>

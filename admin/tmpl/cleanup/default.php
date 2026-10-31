@@ -42,6 +42,7 @@ $titleHtml = preg_replace('/^FG\b/', '<span>FG</span>', $e(Text::_('COM_FGEXTENS
 
 // Styles and script go through the Web Asset Manager so they carry the CSP nonce when one is enabled.
 Text::script('COM_FGEXTENSIONCLEANUP_VISIBLE_COUNT');
+Text::script('COM_FGEXTENSIONCLEANUP_FILTER_ALL_TYPES');
 $wa = $this->getDocument()->getWebAssetManager();
 $wa->useScript('core');
 $wa->addInlineStyle(<<<'CSS'
@@ -131,6 +132,7 @@ html[data-bs-theme="dark"] .fg-cleanup, [data-bs-theme="dark"] .fg-cleanup {
     background: var(--panel); color: var(--muted); font: inherit; font-size: .85rem; cursor: pointer; transition: .2s ease;
 }
 .fg-chip small { font-size: .72rem; opacity: .8; }
+.fg-chip.is-empty { opacity: .45; }
 .fg-chip:hover, .fg-chip.is-active { color: var(--text); border-color: color-mix(in srgb, var(--accent) 40%, transparent); background: var(--accent-soft); }
 
 .fg-panel { border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); box-shadow: var(--shadow); overflow: hidden; }
@@ -459,14 +461,55 @@ $wa->addInlineScript(<<<'JS'
         }
         picks.forEach(function (box) { box.addEventListener('change', refreshBulk); });
 
-        function applyFilters() {
-            var visible = 0;
+        function matchStatus(row, status) {
+            return status === 'all'
+                || (status === 'thirdparty' ? row.getAttribute('data-core') !== '1' : row.getAttribute('data-filter-group') === status);
+        }
+        function matchType(row, type) {
+            return type === 'all' || row.getAttribute('data-extension-type') === type;
+        }
+        function matchSearch(row) {
+            return state.search === '' || (row.getAttribute('data-search') || '').indexOf(state.search) !== -1;
+        }
+
+        // Every filter group shows how many records it would give with the OTHER filters applied,
+        // so the status tiles and the type chips always add up to what the table can show.
+        function refreshCounts() {
+            var byStatus = {}, byType = {}, allTypes = 0;
+            Array.prototype.forEach.call(root.querySelectorAll('button[data-fg-status]'), function (b) { byStatus[b.getAttribute('data-fg-status')] = 0; });
+            Array.prototype.forEach.call(root.querySelectorAll('button[data-fg-type]'), function (b) { byType[b.getAttribute('data-fg-type')] = 0; });
 
             rows.forEach(function (row) {
-                var show = (state.status === 'all'
-                    || (state.status === 'thirdparty' ? row.getAttribute('data-core') !== '1' : row.getAttribute('data-filter-group') === state.status))
-                    && (state.type === 'all' || row.getAttribute('data-extension-type') === state.type)
-                    && (state.search === '' || (row.getAttribute('data-search') || '').indexOf(state.search) !== -1);
+                if (!matchSearch(row)) { return; }
+                if (matchType(row, state.type)) {
+                    Object.keys(byStatus).forEach(function (key) { if (matchStatus(row, key)) { byStatus[key]++; } });
+                }
+                if (matchStatus(row, state.status)) {
+                    allTypes++;
+                    var type = row.getAttribute('data-extension-type');
+                    if (type in byType) { byType[type]++; }
+                }
+            });
+
+            Array.prototype.forEach.call(root.querySelectorAll('button[data-fg-status]'), function (b) {
+                var n = b.querySelector('.fg-tile__count');
+                if (n) { n.textContent = byStatus[b.getAttribute('data-fg-status')]; }
+            });
+            Array.prototype.forEach.call(root.querySelectorAll('button[data-fg-type]'), function (b) {
+                var type = b.getAttribute('data-fg-type');
+                var count = type === 'all' ? allTypes : byType[type];
+                var n = b.querySelector('.fg-chip__n');
+                if (n) { n.textContent = type === 'all' ? Joomla.Text._('COM_FGEXTENSIONCLEANUP_FILTER_ALL_TYPES').replace('%d', count) : count; }
+                b.classList.toggle('is-empty', count === 0 && type !== state.type);
+            });
+        }
+
+        function applyFilters() {
+            var visible = 0;
+            refreshCounts();
+
+            rows.forEach(function (row) {
+                var show = matchStatus(row, state.status) && matchType(row, state.type) && matchSearch(row);
                 row.hidden = !show;
                 var detail = row.nextElementSibling;
                 if (detail && detail.classList.contains('fg-detail-row')) {
@@ -583,11 +626,11 @@ foreach ($this->rows as $item) {
     <div class="fg-filters" role="group" aria-label="<?php echo $e($t('FILTER_TYPE')); ?>">
         <span class="fg-kicker"><?php echo $e($t('FILTER_TYPE')); ?></span>
         <button type="button" class="fg-chip is-active" data-fg-type="all" aria-pressed="true">
-            <?php echo $e(Text::sprintf('COM_FGEXTENSIONCLEANUP_FILTER_ALL_TYPES', $total)); ?>
+            <span class="fg-chip__n"><?php echo $e(Text::sprintf('COM_FGEXTENSIONCLEANUP_FILTER_ALL_TYPES', $total)); ?></span>
         </button>
         <?php foreach ($typeCounts as $type => $typeCount) : ?>
             <button type="button" class="fg-chip" data-fg-type="<?php echo $e($type); ?>" aria-pressed="false">
-                <?php echo $e($typeLabels[$type] ?? $type); ?> <small><?php echo (int) $typeCount; ?></small>
+                <?php echo $e($typeLabels[$type] ?? $type); ?> <small class="fg-chip__n"><?php echo (int) $typeCount; ?></small>
             </button>
         <?php endforeach; ?>
     </div>
