@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.3</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition>
+			<item>Update checksum (sha512) in the update feed; automated tests; reproducible build script.</item>
+		</addition>
+		<change></change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.2</version>
 		<security></security>
 		<fix></fix>

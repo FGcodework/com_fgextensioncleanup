@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.9.3] - 2026-10-31
+
+### Added
+- `updates.xml` now carries a `<sha512>` checksum, so Joomla verifies the downloaded package before installing it.
+- Automated test suite (`php tests/run.php`, no dependencies) covering backups, orphan rules, removal/rollback, restore, update sites, the installer script and language-file consistency.
+- `build.py` (Windows/macOS/Linux) replaces `build.sh`; it builds a reproducible ZIP and writes its SHA-512 into `updates.xml`.
+
 ## [1.9.2] - 2026-10-31
 
 ### Added
