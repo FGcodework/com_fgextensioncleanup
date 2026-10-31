@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.4</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>The OK tile is labelled "OK (third-party)" because it excludes core extensions.</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.3</version>
 		<security></security>
 		<fix></fix>

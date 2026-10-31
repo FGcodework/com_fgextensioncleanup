@@ -18,7 +18,7 @@ $total = count($this->rows);
 $statusTiles = [
     'all' => ['label' => $t('F_ALL'), 'variant' => 'accent', 'count' => $total],
     'thirdparty' => ['label' => $t('F_THIRDPARTY'), 'variant' => 'accent', 'count' => $total - (int) $counts['core']],
-    'ok' => ['label' => $t('R_OK_L'), 'variant' => 'ok', 'count' => (int) $counts['ok']],
+    'ok' => ['label' => $t('F_OK_TILE'), 'variant' => 'ok', 'count' => (int) $counts['ok']],
     'repairable' => ['label' => $t('F_REPAIRABLE'), 'variant' => 'warn', 'count' => (int) $counts['repairable']],
     'ambiguous' => ['label' => $t('F_AMBIGUOUS'), 'variant' => 'accent', 'count' => (int) $counts['ambiguous']],
     'orphan' => ['label' => $t('F_ORPHAN'), 'variant' => 'bad', 'count' => (int) $counts['orphan']],
