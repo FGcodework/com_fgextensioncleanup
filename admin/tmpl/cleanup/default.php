@@ -82,21 +82,13 @@ html[data-bs-theme="dark"] .fg-cleanup, [data-bs-theme="dark"] .fg-cleanup {
 .fg-cleanup a { color: inherit; text-decoration: none; }
 .fg-cleanup code { color: var(--accent); background: transparent; padding: 0; font-size: .85em; }
 
-.fg-hero { margin-bottom: 22px; }
-.fg-eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 5px 11px;
-    border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
-    border-radius: 999px; background: var(--accent-soft); color: var(--accent);
-    font-size: .76rem; font-weight: 750; letter-spacing: .05em; text-transform: uppercase;
-}
-.fg-eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 14px currentColor; }
-.fg-cleanup h1 { margin: 14px 0 6px; font-size: clamp(1.9rem, 4.4vw, 3rem); line-height: 1.05; letter-spacing: -.045em; color: var(--text); }
+.fg-hero { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 14px; margin-bottom: 14px; }
+.fg-cleanup h1 { margin: 0; font-size: clamp(1.35rem, 2.6vw, 1.7rem); font-weight: 750; line-height: 1.15; letter-spacing: -.03em; color: var(--text); }
 .fg-cleanup h1 span { color: var(--accent); }
-.fg-lead { margin: 0; color: var(--muted); font-size: 1.02rem; }
+.fg-lead { margin: 0; color: var(--muted); font-size: .92rem; }
 
 .fg-note {
-    margin: 0 0 22px; padding: 14px 18px;
+    margin: 0 0 18px; padding: 14px 18px;
     border: 1px solid color-mix(in srgb, var(--accent) 25%, transparent);
     border-radius: 15px;
     background: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 18rem), var(--panel);
@@ -602,7 +594,6 @@ foreach ($this->rows as $item) {
 ?>
 <div class="fg-cleanup">
     <div class="fg-hero">
-        <span class="fg-eyebrow"><?php echo $e($t('EYEBROW')); ?></span>
         <h1><?php echo $titleHtml; ?></h1>
         <p class="fg-lead"><?php echo $e($t('SUBTITLE')); ?></p>
     </div>

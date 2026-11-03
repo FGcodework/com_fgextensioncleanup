@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.7] - 2026-11-03
+
+### Changed
+- Compact page header: smaller bold title with the subtitle on the same line; the "Diagnostics · safe repair" badge was removed. More of the table is visible without scrolling.
+
 ## [1.9.6] - 2026-11-03
 
 ### Changed

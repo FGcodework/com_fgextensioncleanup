@@ -3,6 +3,20 @@
 	<changelog>
 		<element>com_fgextensioncleanup</element>
 		<type>component</type>
+		<version>1.9.7</version>
+		<security></security>
+		<fix></fix>
+		<language></language>
+		<addition></addition>
+		<change>
+			<item>Compact page header (smaller bold title, subtitle inline, badge removed).</item>
+		</change>
+		<remove></remove>
+		<note></note>
+	</changelog>
+	<changelog>
+		<element>com_fgextensioncleanup</element>
+		<type>component</type>
 		<version>1.9.6</version>
 		<security></security>
 		<fix></fix>
