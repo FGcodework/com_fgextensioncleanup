@@ -26,7 +26,8 @@ namespace Joomla\CMS {
     {
         public static ?string $logPath = null;
         public static $db;
-        public static function getApplication() { return new class { public function get($key) { return \Joomla\CMS\Factory::$logPath; } }; }
+        public static array $loaded = [];
+        public static function getApplication() { return new class { public function get($key) { return \Joomla\CMS\Factory::$logPath; } public function getLanguage() { return new class { public function load($ext, $path) { \Joomla\CMS\Factory::$loaded[] = $ext . '@' . $path; return true; } }; } }; }
         public static function getContainer() { return new class { public function get($id) { return \Joomla\CMS\Factory::$db; } }; }
     }
 }
@@ -103,10 +104,13 @@ namespace {
     define('FG_PROJECT', dirname(__DIR__));
     define('JPATH_ROOT', sys_get_temp_dir() . '/fgcleanup_tests_' . getmypid());
     define('JPATH_ADMINISTRATOR', JPATH_ROOT . '/administrator');
+    define('JPATH_SITE', JPATH_ROOT);
+    define('JPATH_PLUGINS', JPATH_ROOT . '/plugins');
 
     \Joomla\CMS\Language\Text::$strings = parse_ini_file(FG_PROJECT . '/admin/language/en-GB/com_fgextensioncleanup.ini');
 
     require FG_PROJECT . '/admin/src/Service/BackupStore.php';
+    require FG_PROJECT . '/admin/src/Service/NameTranslator.php';
     require FG_PROJECT . '/admin/src/Model/CleanupModel.php';
     require FG_PROJECT . '/admin/src/Model/MaintenanceModel.php';
 

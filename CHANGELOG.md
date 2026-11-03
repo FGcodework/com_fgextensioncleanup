@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.6] - 2026-11-03
+
+### Changed
+- Extension names stored as language keys (e.g. `COM_FGCHANGELOGS`) are now shown translated ("FG Changelogs"), like in Joomla's own extension manager. The raw name stays in the tooltip and is still searchable. Display only - it never influences scanning, repair or removal.
+
 ## [1.9.5] - 2026-10-31
 
 ### Changed

@@ -4,6 +4,7 @@ defined('_JEXEC') or die;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Router\Route;
+use FGcodework\Component\FgExtensionCleanup\Administrator\Service\NameTranslator;
 
 /** @var \FGcodework\Component\FgExtensionCleanup\Administrator\View\Cleanup\HtmlView $this */
 
@@ -700,10 +701,11 @@ foreach ($this->rows as $item) {
                             3 => $t('CLIENT_API'),
                             default => $t('CLIENT_SITE'),
                         };
+                        $displayName = NameTranslator::translate($record);
                         $hasMore = !empty($analysis['candidates']) || !empty($analysis['package']) || !empty($analysis['blocked_paths']);
                         ?>
                         <tr data-filter-group="<?php echo $e($filterGroup); ?>" data-core="<?php echo $isCore ? '1' : '0'; ?>" data-extension-type="<?php echo $e($type); ?>"
-                            data-search="<?php echo $e(mb_strtolower((int) $record->extension_id . ' ' . $record->name . ' ' . $record->element . ' ' . ($record->folder ?? '') . ' ' . $type)); ?>">
+                            data-search="<?php echo $e(mb_strtolower((int) $record->extension_id . ' ' . $displayName . ' ' . $record->name . ' ' . $record->element . ' ' . ($record->folder ?? '') . ' ' . $type)); ?>">
                             <td class="fg-col-toggle">
                                 <?php if ($hasMore) : ?>
                                     <button type="button" class="fg-toggle" data-fg-toggle aria-expanded="false" aria-label="<?php echo $e($t('TOGGLE_DETAILS')); ?>" title="<?php echo $e($t('TOGGLE_DETAILS')); ?>">›</button>
@@ -724,7 +726,7 @@ foreach ($this->rows as $item) {
                                     $nameMeta[] = 'package_id: ' . (int) $record->package_id;
                                 }
                                 ?>
-                                <span class="fg-name"><?php echo $e($record->name); ?></span>
+                                <span class="fg-name"<?php echo $displayName !== (string) $record->name ? ' title="' . $e((string) $record->name) . '"' : ''; ?>><?php echo $e($displayName); ?></span>
                                 <?php if ($nameMeta) : ?><span class="fg-line2"><?php echo $e(implode(' · ', $nameMeta)); ?></span><?php endif; ?>
                             </td>
                             <td>
@@ -746,9 +748,9 @@ foreach ($this->rows as $item) {
                                     </form>
                                 <?php elseif ($this->canAdmin && in_array($type, ['plugin', 'library', 'component'], true) && $status === 'orphan' && $analysis['removable'] && empty($record->protected)) : ?>
                                     <input type="checkbox" class="fg-pick" form="fg-bulk-form" name="extension_id[]" value="<?php echo (int) $record->extension_id; ?>"
-                                           data-name="<?php echo $e($record->name . ' (' . $type . ': ' . $record->element . ')'); ?>"
+                                           data-name="<?php echo $e($displayName . ' (' . $type . ': ' . $record->element . ')'); ?>"
                                            aria-label="<?php echo $e($t('BULK_SELECT_ROW')); ?>">
-                                    <form method="post" action="<?php echo $e($baseUrl); ?>" style="display:inline" data-fg-confirm="<?php echo $e($t($type === 'component' ? 'CONFIRM_REMOVE_COMPONENT' : 'CONFIRM_REMOVE')); ?>" data-fg-details="<?php echo $e($record->name . ' (' . $type . ': ' . $record->element . ')'); ?>">
+                                    <form method="post" action="<?php echo $e($baseUrl); ?>" style="display:inline" data-fg-confirm="<?php echo $e($t($type === 'component' ? 'CONFIRM_REMOVE_COMPONENT' : 'CONFIRM_REMOVE')); ?>" data-fg-details="<?php echo $e($displayName . ' (' . $type . ': ' . $record->element . ')'); ?>">
                                         <input type="hidden" name="task" value="removeOrphanRecord">
                                         <input type="hidden" name="extension_id" value="<?php echo (int) $record->extension_id; ?>">
                                         <?php echo HTMLHelper::_('form.token'); ?>

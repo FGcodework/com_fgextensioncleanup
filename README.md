@@ -38,7 +38,7 @@ Updates are delivered through the built-in Joomla update server (`updates.xml` i
 ## Building the package
 
 ```bash
-python build.py   # creates com_fgextensioncleanup_v<version>.zip and writes its SHA-512 into updates.xml
+python build.py   # creates com_fgextensioncleanup_v<version>.zip and writes its SHA-256 and SHA-512 into updates.xml
 ```
 
 The ZIP is reproducible (sorted entries, fixed timestamps), so the checksum in `updates.xml` always belongs to the file `build.py` produced. Upload **that exact file** as the release asset; a re-zipped copy would fail Joomla's checksum verification.
@@ -55,7 +55,7 @@ The suite is dependency-free (a tiny runner plus stubs of the Joomla classes and
 ## Releasing
 
 1. Bump `<version>` in `com_fgextensioncleanup.xml`, add an entry to `CHANGELOG.md`, `changelog.xml` and `updates.xml` (version and download URL).
-2. `python build.py` (after `php tests/run.php`) - it fills in the `<sha512>` of `updates.xml`.
+2. `python build.py` (after `php tests/run.php`) - it fills in the `<sha256>` and `<sha512>` of `updates.xml`.
 3. Commit, push to `master`, then publish a GitHub release tagged `vX.Y.Z` with the ZIP attached (the file name in `updates.xml` must match).
 
 ## Support

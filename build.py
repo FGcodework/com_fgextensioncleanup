@@ -4,7 +4,7 @@
     python build.py
 
 Creates com_fgextensioncleanup_v<version>.zip next to this script (version is read from the
-manifest), then writes the archive's SHA-512 into updates.xml. The archive is deterministic
+manifest), then writes the archive's SHA-256 and SHA-512 into updates.xml. The archive is deterministic
 (sorted entries, fixed timestamps and permissions), so building twice gives the same file.
 Upload exactly this file as the GitHub release asset - the checksum belongs to these bytes.
 Works on Windows, macOS and Linux; Python 3.8+ only, no third-party packages.
@@ -54,16 +54,19 @@ def build(archive: Path) -> None:
             zf.writestr(info, path.read_bytes(), compresslevel=9)
 
 
-def write_checksum(version: str, digest: str) -> None:
+def set_tag(xml: str, tag: str, digest: str) -> str:
+    if f"<{tag}>" in xml:
+        return re.sub(rf"<{tag}>[^<]*</{tag}>", f"<{tag}>{digest}</{tag}>", xml)
+    return re.sub(r"(\n(\s*)<tags>)", lambda m: f"\n{m.group(2)}<{tag}>{digest}</{tag}>{m.group(1)}", xml, count=1)
+
+
+def write_checksum(version: str, sha256: str, sha512: str) -> None:
     updates = ROOT / "updates.xml"
     xml = updates.read_text(encoding="utf-8")
     declared = re.search(r"<version>([^<]+)</version>", xml)
     if not declared or declared.group(1) != version:
         sys.exit(f"updates.xml version ({declared.group(1) if declared else '?'}) differs from the manifest ({version}). Update updates.xml first.")
-    if "<sha512>" in xml:
-        xml = re.sub(r"<sha512>[^<]*</sha512>", f"<sha512>{digest}</sha512>", xml)
-    else:
-        xml = re.sub(r"(\n(\s*)<tags>)", lambda m: f"\n{m.group(2)}<sha512>{digest}</sha512>{m.group(1)}", xml, count=1)
+    xml = set_tag(set_tag(xml, "sha512", sha512), "sha256", sha256)
     updates.write_text(xml, encoding="utf-8", newline="\n")
 
 
@@ -71,10 +74,13 @@ def main() -> None:
     version = read_version()
     archive = ROOT / f"{NAME}_v{version}.zip"
     build(archive)
-    digest = hashlib.sha512(archive.read_bytes()).hexdigest()
-    write_checksum(version, digest)
+    data = archive.read_bytes()
+    sha256 = hashlib.sha256(data).hexdigest()
+    sha512 = hashlib.sha512(data).hexdigest()
+    write_checksum(version, sha256, sha512)
     print(f"Built {archive.name} ({archive.stat().st_size} bytes)")
-    print(f"SHA-512 {digest}")
+    print(f"SHA-256 {sha256}")
+    print(f"SHA-512 {sha512}")
     print("updates.xml updated - commit it, then upload this exact zip to the release.")
 
 
