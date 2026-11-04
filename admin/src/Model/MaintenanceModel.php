@@ -11,7 +11,7 @@ use RuntimeException;
 /** Orphaned update sites and the backup/restore of everything this component deletes. */
 final class MaintenanceModel extends BaseDatabaseModel
 {
-    private const RESTORABLE_TYPES = ['plugin', 'library', 'component'];
+    private const RESTORABLE_TYPES = ['plugin', 'library', 'component', ''];
     private const REPORT_LIMIT = 100;
 
     // ---------------------------------------------------------------- update sites

@@ -101,3 +101,9 @@ test('other orphans: report is limited and never deletes anything', function () 
     same([1, 1, 1], [count($report['modules']), count($report['menu']), count($report['schemas'])]);
     same([], array_filter($db->log, fn ($l) => str_starts_with($l, 'DELETE')));
 });
+
+test('restore: a backup of a blank record can be put back', function () {
+    $db = fresh();
+    $file = backupOf(['extension_id' => '305', 'name' => '', 'type' => '', 'element' => '', 'folder' => '', 'client_id' => '0']);
+    same(305, model('MaintenanceModel')->restoreBackup($file)['id']);
+});

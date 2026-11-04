@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.9.8] - 2026-11-04
+
+### Added
+- **Blank records**: a `#__extensions` row with no type, element, name and folder (not protected, not in a package) is now reported as an orphaned "Blank record" instead of "Unsupported extension type", and can be removed (single or bulk) with the usual JSON backup, Action Log entry and Restore. A typeless row that has any identifying data stays read-only.
+
 ## [1.9.7] - 2026-11-03
 
 ### Changed

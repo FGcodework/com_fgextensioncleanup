@@ -133,3 +133,34 @@ test('scan: core records never count as orphaned', function () {
     same(2, $scan['counts']['core']);
     same(1, $scan['counts']['orphan']);
 });
+
+test('blank record: no type, element, name and folder is an orphan that can be removed', function () {
+    fresh();
+    $row = analyse(rec(['extension_id' => 305, 'type' => '', 'element' => '', 'name' => '']));
+    same('orphan', $row['analysis']['status']);
+    same(true, $row['analysis']['removable']);
+});
+
+test('blank record: anything that identifies the row keeps it read-only', function () {
+    fresh();
+    foreach ([['name' => 'Something'], ['element' => 'x'], ['folder' => 'system'], ['protected' => 1], ['package_id' => 4]] as $extra) {
+        $row = analyse(rec(array_merge(['type' => '', 'element' => '', 'name' => ''], $extra)));
+        same(false, $row['analysis']['removable'], json_encode($extra));
+    }
+});
+
+test('blank record: removal writes a "blank" backup and deletes inside a transaction', function () {
+    $db = fresh();
+    $db->record = rec(['extension_id' => 305, 'type' => '', 'element' => '', 'name' => '']);
+    $result = model('CleanupModel')->removeOrphanRecord(305);
+    same('blank', $result['type']);
+    ok(str_contains($result['backup'], 'fgextensioncleanup_backup_blank_305_'), $result['backup']);
+    same(['tx start', 'DELETE #__extensions', 'DELETE #__schemas', 'DELETE #__update_sites_extensions', 'tx commit'], $db->log);
+});
+
+test('blank record: a typeless row with a name cannot be removed through the endpoint', function () {
+    $db = fresh();
+    $db->record = rec(['extension_id' => 306, 'type' => '', 'element' => '', 'name' => 'Mystery']);
+    throws(fn () => model('CleanupModel')->removeOrphanRecord(306));
+    same([], $db->log);
+});

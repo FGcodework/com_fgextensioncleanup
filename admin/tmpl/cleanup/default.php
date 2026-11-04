@@ -36,6 +36,8 @@ $typeLabels = [
     'template' => $t('T_TEMPLATE'),
     'language' => $t('T_LANGUAGE'),
     'file' => $t('T_FILE'),
+    '' => $t('T_NONE'),
+    'blank' => $t('T_NONE'),
 ];
 
 // "FG" in the page title is highlighted like the brand on fgcodework.github.io.
@@ -586,7 +588,7 @@ JS);
 <?php
 $removableCount = 0;
 foreach ($this->rows as $item) {
-    if (empty($item['core']) && in_array((string) $item['record']->type, ['plugin', 'library', 'component'], true)
+    if (empty($item['core']) && in_array((string) $item['record']->type, ['plugin', 'library', 'component', ''], true)
         && $item['analysis']['status'] === 'orphan' && $item['analysis']['removable'] && empty($item['record']->protected)) {
         $removableCount++;
     }
@@ -737,7 +739,7 @@ foreach ($this->rows as $item) {
                                         <?php echo HTMLHelper::_('form.token'); ?>
                                         <button type="submit" class="fg-btn fg-btn--sm fg-btn--warn"><?php echo $e($t('BTN_REPAIR')); ?></button>
                                     </form>
-                                <?php elseif ($this->canAdmin && in_array($type, ['plugin', 'library', 'component'], true) && $status === 'orphan' && $analysis['removable'] && empty($record->protected)) : ?>
+                                <?php elseif ($this->canAdmin && in_array($type, ['plugin', 'library', 'component', ''], true) && $status === 'orphan' && $analysis['removable'] && empty($record->protected)) : ?>
                                     <input type="checkbox" class="fg-pick" form="fg-bulk-form" name="extension_id[]" value="<?php echo (int) $record->extension_id; ?>"
                                            data-name="<?php echo $e($displayName . ' (' . $type . ': ' . $record->element . ')'); ?>"
                                            aria-label="<?php echo $e($t('BULK_SELECT_ROW')); ?>">

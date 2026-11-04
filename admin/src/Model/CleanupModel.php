@@ -65,6 +65,8 @@ final class CleanupModel extends BaseDatabaseModel
 
             if ($type === 'plugin') {
                 $analysis = $this->analysePluginRecord($record);
+            } elseif ($this->isBlankRecord($record)) {
+                $analysis = $this->blankAnalysis();
             } elseif (in_array($type, self::SUPPORTED_TYPES, true)) {
                 $analysis = $this->analyseStandardRecord($record, $records, $packageChildren[(int) $record->extension_id] ?? []);
             } else {
@@ -136,12 +138,16 @@ final class CleanupModel extends BaseDatabaseModel
      */
     public function removeOrphanRecord(int $id): array
     {
-        $record = $this->getRecord($id, ['plugin', 'library', 'component']);
+        $record = $this->getRecord($id, ['plugin', 'library', 'component', '']);
         $type = (string) $record->type;
 
-        $analysis = $type === 'plugin'
-            ? $this->analysePluginRecord($record)
-            : $this->analyseStandardRecord($record, [], []);
+        if ($type === '') {
+            $analysis = $this->isBlankRecord($record) ? $this->blankAnalysis() : $this->result('unsupported', '', '');
+        } else {
+            $analysis = $type === 'plugin'
+                ? $this->analysePluginRecord($record)
+                : $this->analyseStandardRecord($record, [], []);
+        }
 
         if ($analysis['status'] !== 'orphan' || !$analysis['removable'] || !empty($record->protected) || $this->isCoreExtension($record)) {
             throw new RuntimeException(Text::_('COM_FGEXTENSIONCLEANUP_ERR_REMOVE_NOT_CONFIRMED'));
@@ -188,7 +194,32 @@ final class CleanupModel extends BaseDatabaseModel
                 : new RuntimeException($exception->getMessage(), 0, $exception);
         }
 
-        return $this->recordSummary($record) + ['backup' => $backup];
+        return ($type === '' ? ['type' => 'blank'] : []) + $this->recordSummary($record) + ['backup' => $backup];
+    }
+
+    /**
+     * A blank record has no type, no element, no name and no folder at all, is not protected and not part of a package.
+     * Joomla cannot load such a row as any extension, so nothing can depend on it.
+     */
+    private function isBlankRecord(object $record): bool
+    {
+        return trim((string) ($record->type ?? '')) === ''
+            && trim((string) ($record->element ?? '')) === ''
+            && trim((string) ($record->name ?? '')) === ''
+            && trim((string) ($record->folder ?? '')) === ''
+            && empty($record->protected)
+            && (int) ($record->package_id ?? 0) === 0;
+    }
+
+    private function blankAnalysis(): array
+    {
+        return $this->result(
+            'orphan',
+            Text::_('COM_FGEXTENSIONCLEANUP_R_BLANK_L'),
+            Text::_('COM_FGEXTENSIONCLEANUP_R_BLANK_D'),
+            null,
+            true
+        );
     }
 
     private function recordSummary(object $record): array
@@ -285,7 +316,7 @@ final class CleanupModel extends BaseDatabaseModel
             return $db->loadAssocList() ?: [];
         };
 
-        return (new BackupStore())->write((string) $record->type, $id, [
+        return (new BackupStore())->write((string) $record->type !== '' ? (string) $record->type : 'blank', $id, [
             'kind' => 'extension',
             'note' => 'Rows deleted from the database. Restore them from FG Extension Cleanup or re-insert them with their original column names.',
             'extensions' => $fetch('#__extensions', 'extension_id'),
