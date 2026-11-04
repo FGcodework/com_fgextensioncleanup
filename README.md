@@ -1,11 +1,15 @@
 <p align="center"><img src="assets/logo.png" alt="FG Extension Cleanup" width="128"></p>
 
-# FG Extension Cleanup
+<h1 align="center">FG Extension Cleanup</h1>
 
-[![Release](https://img.shields.io/github/v/release/FGcodework/com_fgextensioncleanup?style=flat-square)](https://github.com/FGcodework/com_fgextensioncleanup/releases/latest)
-![Joomla 5 | 6](https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-1a73e8?style=flat-square)
-![PHP 8.1+](https://img.shields.io/badge/PHP-8.1%2B-777bb3?style=flat-square)
-[![License GPL-2.0-or-later](https://img.shields.io/badge/license-GPL--2.0--or--later-green?style=flat-square)](LICENSE)
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/FGcodework/com_fgextensioncleanup?color=FF6B4A&label=release" alt="Latest release">
+  <img src="https://img.shields.io/badge/Joomla-5.x%20%7C%206.x-1a3867.svg?logo=joomla&logoColor=white" alt="Joomla">
+  <img src="https://img.shields.io/badge/PHP-8.1%2B-purple.svg?logo=php&logoColor=white" alt="PHP">
+  <img src="https://img.shields.io/badge/license-GPL--2.0%2B-green.svg" alt="License">
+  <img src="https://img.shields.io/github/downloads/FGcodework/com_fgextensioncleanup/total?cacheSeconds=3600&color=brown" alt="Downloads">
+  <a href="https://ko-fi.com/FGcodework"><img src="https://img.shields.io/badge/support-Ko--fi-F16061.svg?logo=ko-fi&logoColor=white" alt="Support on Ko-fi"></a>
+</p>
 
 Administrator component for **Joomla 5 and 6** that diagnoses and safely cleans orphaned records in `#__extensions` and `#__update_sites` – the leftovers of extensions whose files are gone but whose database registration remained. Part of the **FG** extension series. UI languages: English (en-GB) and Slovak (sk-SK).
 
